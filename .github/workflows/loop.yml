@@ -2,8 +2,8 @@ name: Loop Commit
 
 on:
   schedule:
-    - cron: '*/3 * * * *'  # every 3 minutes
-  workflow_dispatch:       # also run manually
+    - cron: '*/1 * * * *'  # every 1 minutes
+  workflow_dispatch:
 
 jobs:
   loop-commit:
@@ -13,18 +13,21 @@ jobs:
       - name: Checkout repo
         uses: actions/checkout@v3
 
+      - name: Setup Git config
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
       - name: Add number 1 to file
         run: |
           echo "1" > file.txt
-          git config --global user.name "github-actions[bot]"
-          git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add file.txt
-          git commit -m "Add 1 to file"
-          git push
+          git commit -m "Add 1 to file" || echo "No changes to commit"
+          git push || echo "Nothing to push"
 
       - name: Remove number 1 from file
         run: |
           echo "" > file.txt
           git add file.txt
-          git commit -m "Remove 1 from file"
-          git push
+          git commit -m "Remove 1 from file" || echo "No changes to commit"
+          git push || echo "Nothing to push"
