@@ -1,40 +1,40 @@
-name: Loop Commit
+name: mahmoudWalid Commit
 
 on:
   schedule:
-    - cron: '*/5 * * * *'   # every 1 minutes
+    - cron: '*/5 * * * *'
   workflow_dispatch:
 
 permissions:
   contents: write
 
 jobs:
-  loop-commit:
+  commit:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repo
-        uses: actions/checkout@v3
-        with:
-          persist-credentials: true
+    - name: Checkout repository
+      uses: actions/checkout@v2
+      with:
+        ref: main
+        persist-credentials: true
 
-      - name: Setup git user
-        run: |
-          git config --global user.name "github-actions[bot]"
-          git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
-
-      - name: Add number 1 to file
-        run: |
-          echo "1" > file.txt
-          git diff  # لرؤية التغيير إن وجد
-          git add file.txt
-          git commit -m "Add 1 to file" || echo "No changes to commit"
-          git push || echo "Nothing to push"
-
-      - name: Remove number 1 from file
-        run: |
-          echo "" > file.txt
-          git diff
-          git add file.txt
-          git commit -m "Remove 1 from file" || echo "No changes to commit"
-          git push || echo "Nothing to push"
+    - name: Create file and commit
+      run: |
+        FILE="commit_number.md"
+        if [ ! -f "$FILE" ]; then
+          echo "Hello, my name is mahmoud walid" > "$FILE"
+          echo "commit number: 1" >> "$FILE"
+        else
+          CURRENT_COUNT=$(grep -oP 'commit number: \K\d+' "$FILE")
+          if [ -z "$CURRENT_COUNT" ]; then
+            CURRENT_COUNT=0
+          fi
+          NEXT_COUNT=$((CURRENT_COUNT + 1))
+          sed -i "/commit number:/c\commit number: $NEXT_COUNT" "$FILE"
+        fi
+        git config --global user.name "mahmoudProfile2"
+        git config --global user.email "mahmoudprofile2@gmail.com"
+        git add "$FILE"
+        git commit -m "Update commit number to $NEXT_COUNT" || echo "Nothing to commit"
+        git push || echo "Push failed"
